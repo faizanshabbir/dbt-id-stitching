@@ -1,8 +1,8 @@
 WITH columns AS (
     SELECT
         column_name AS cn,
-        table_catalog || '.' || table_schema || '.' || table_name AS tn
-    FROM {{ source('information_schema', 'columns') }}
+        table_schema || '.' || table_name AS tn
+    FROM {{ref('dbt_information_schema')}}
     WHERE
         LOWER(column_name) IN {{ var('id-columns') }}
         {% if var('schemas-to-include') != '()' %}

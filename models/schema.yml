@@ -1,11 +1,8 @@
 version: 2
 
-sources:
-  - name: information_schema
-    tables:
-      - name: columns
-
 models:
+  - name: information_schema
+
   - name: queries
     columns:
       - name: sql_to_run
