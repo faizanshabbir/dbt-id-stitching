@@ -2,9 +2,11 @@
 
 {% set final_col_list = [] %}
 
+{% set parsed_schemas = input_schemas | replace("(", "") | replace(")", "") | replace("'", "") %}
+
 {% if execute %}
     {% set columns = [] %}
-    {% for s in input_schemas %}
+    {% for s in parsed_schemas.split(",") %}
        {% set results = run_query('SHOW TABLES IN ' + s) %}
        {% for t in results.columns[1].values() %}
             {% set col_result = run_query('SHOW COLUMNS IN '+ s + '.' + t) %}
