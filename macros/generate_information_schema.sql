@@ -1,16 +1,19 @@
-{% macro generate_information_schema(input_schemas) %}
+{% macro generate_information_schema(input_schemas, input_tables) %}
 
 {% set final_col_list = [] %}
 
 {% set parsed_schemas = input_schemas | replace("(", "") | replace(")", "") | replace("'", "") %}
+{% set parsed_tables = input_tables | replace("(", "") | replace(")", "") | replace("'", "") %}
 
 {% if execute %}
     {% set columns = [] %}
     {% for s in parsed_schemas.split(",") %}
        {% set results = run_query('SHOW TABLES IN ' + s) %}
        {% for t in results.columns[1].values() %}
-            {% set col_result = run_query('SHOW COLUMNS IN '+ s + '.' + t) %}
-            {% do columns.append((s, t, col_result.columns[0].values())) %}
+            {% if t in parsed_tables.split(",") %}
+                {% set col_result = run_query('SHOW COLUMNS IN '+ s + '.' + t) %}
+                {% do columns.append((s, t, col_result.columns[0].values())) %}
+            {% endif %}
         {% endfor %}
     {% endfor %}
     {% for res in columns %}
@@ -22,11 +25,13 @@
 
 {% if execute %}
     {% set columns = [] %}
-    {% for s in input_schemas %}
+    {% for s in parsed_schemas.split(",") %}
        {% set results = run_query('SHOW VIEWS IN ' + s) %}
        {% for t in results.columns[1].values() %}
-            {% set col_result = run_query('SHOW COLUMNS IN '+ s + '.' + t) %}
-            {% do columns.append((s, t, col_result.columns[0].values())) %}
+            {% if t in parsed_tables.split(",") %}
+                {% set col_result = run_query('SHOW COLUMNS IN '+ s + '.' + t) %}
+                {% do columns.append((s, t, col_result.columns[0].values())) %}
+            {% endif %}
         {% endfor %}
     {% endfor %}
     {% for res in columns %}
